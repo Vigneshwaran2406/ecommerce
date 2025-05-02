@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/layout :: head(title='My Profile')"></head>
+<body>
+    <header th:replace="fragments/layout :: header"></header>
+    
+    <main class="container mt-5 pt-5">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Account Navigation</h5>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        <a th:href="@{/profile}" class="list-group-item list-group-item-action active">
+                            <i class="bi bi-person me-2"></i> My Profile
+                        </a>
+                        <a th:href="@{/orders}" class="list-group-item list-group-item-action">
+                            <i class="bi bi-box me-2"></i> My Orders
+                        </a>
+                        <a th:href="@{/profile/edit}" class="list-group-item list-group-item-action">
+                            <i class="bi bi-gear me-2"></i> Edit Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Profile Information</h5>
+                        <a th:href="@{/profile/edit}" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-pencil"></i> Edit
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h6 class="text-muted mb-3">Personal Information</h6>
+                                <p class="mb-1">
+                                    <strong>Name:</strong> 
+                                    <span th:text="${user.firstName + ' ' + user.lastName}">John Doe</span>
+                                </p>
+                                <p class="mb-1">
+                                    <strong>Email:</strong> 
+                                    <span th:text="${user.email}">john@example.com</span>
+                                </p>
+                                <p class="mb-1">
+                                    <strong>Phone:</strong> 
+                                    <span th:text="${user.phoneNumber != null ? user.phoneNumber : 'Not provided'}">123-456-7890</span>
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-muted mb-3">Address Information</h6>
+                                <p class="mb-1" th:if="${user.address != null && !user.address.isEmpty()}">
+                                    <span th:text="${user.address}">123 Street</span>
+                                </p>
+                                <p class="mb-1" th:if="${user.city != null && !user.city.isEmpty() || user.state != null && !user.state.isEmpty()}">
+                                    <span th:text="${user.city + (user.city != null && !user.city.isEmpty() && user.state != null && !user.state.isEmpty() ? ', ' : '') + user.state}">City, State</span>
+                                </p>
+                                <p class="mb-1" th:if="${user.zipCode != null && !user.zipCode.isEmpty()}">
+                                    <span th:text="${user.zipCode}">12345</span>
+                                </p>
+                                <p class="mb-1" th:if="${user.country != null && !user.country.isEmpty()}">
+                                    <span th:text="${user.country}">Country</span>
+                                </p>
+                                <p class="text-muted" th:if="${user.address == null || user.address.isEmpty()}">
+                                    No address information provided. <a th:href="@{/profile/edit}">Add now</a>
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <h6 class="text-muted mb-3">Account Information</h6>
+                        <p class="mb-1">
+                            <strong>Member Since:</strong> 
+                            <span th:text="${#temporals.format(user.createdAt, 'dd-MM-yyyy')}">01-01-2025</span>
+                        </p>
+                        <p class="mb-1">
+                            <strong>Account Type:</strong> 
+                            <span th:if="${user.hasRole('ADMIN')}">Administrator</span>
+                            <span th:unless="${user.hasRole('ADMIN')}">Customer</span>
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Recent Orders</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="recentOrders">
+                            <!-- Recent orders will be loaded here via AJAX -->
+                            <p class="text-center">
+                                <a th:href="@{/orders}" class="btn btn-outline-primary">
+                                    View All Orders
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer th:replace="fragments/layout :: footer"></footer>
+</body>
+</html>

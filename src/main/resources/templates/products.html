@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head th:replace="fragments/layout :: head(title='Products')"></head>
+<body>
+    <header th:replace="fragments/layout :: header"></header>
+    
+    <main class="container mt-5 pt-5">
+        <div class="row">
+            <!-- Sidebar with filters -->
+            <div class="col-lg-3 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Filters</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="mb-3">Categories</h6>
+                        <div class="mb-4">
+                            <ul class="list-group">
+                                <li class="list-group-item border-0 p-0 mb-2">
+                                    <a th:href="@{/products}" class="text-decoration-none text-dark">
+                                        All Categories
+                                    </a>
+                                </li>
+                                <li class="list-group-item border-0 p-0 mb-2" th:each="category : ${categories}">
+                                    <a th:href="@{/products(categoryId=${category.id})}" 
+                                       class="text-decoration-none" 
+                                       th:classappend="${selectedCategory != null && selectedCategory.id == category.id ? 'text-primary fw-bold' : 'text-dark'}">
+                                        <span th:text="${category.name}">Category Name</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <h6 class="mb-3">Sort By</h6>
+                        <div class="mb-3">
+                            <select class="form-select" id="sort-select" onchange="updateSortOrder()">
+                                <option value="name,asc" th:selected="${sort == 'name' && direction == 'asc'}">Name (A-Z)</option>
+                                <option value="name,desc" th:selected="${sort == 'name' && direction == 'desc'}">Name (Z-A)</option>
+                                <option value="price,asc" th:selected="${sort == 'price' && direction == 'asc'}">Price (Low to High)</option>
+                                <option value="price,desc" th:selected="${sort == 'price' && direction == 'desc'}">Price (High to Low)</option>
+                                <option value="createdAt,desc" th:selected="${sort == 'createdAt' && direction == 'desc'}">Newest First</option>
+                                <option value="createdAt,asc" th:selected="${sort == 'createdAt' && direction == 'asc'}">Oldest First</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Product grid -->
+            <div class="col-lg-9">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2 th:if="${keyword != null}" th:text="'Search results for: ' + ${keyword}">Search Results</h2>
+                        <h2 th:if="${selectedCategory != null}" th:text="${selectedCategory.name}">Category Name</h2>
+                        <h2 th:if="${keyword == null && selectedCategory == null}">All Products</h2>
+                        <p class="text-muted" th:text="${'Showing ' + products.size() + ' of ' + totalItems + ' products'}">Showing products</p>
+                    </div>
+                    
+                    <div class="d-flex">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-secondary" onclick="toggleView('grid')">
+                                <i class="bi bi-grid"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="toggleView('list')">
+                                <i class="bi bi-list"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Grid View -->
+                <div id="grid-view" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                    <div class="col" th:each="product : ${products}">
+                        <div class="card h-100 product-card">
+                            <div class="position-absolute top-0 end-0 p-2">
+                                <span class="badge bg-success" th:if="${product.stockQuantity > 10}">In Stock</span>
+                                <span class="badge bg-warning text-dark" th:if="${product.stockQuantity > 0 && product.stockQuantity <= 10}">Low Stock</span>
+                                <span class="badge bg-danger" th:if="${product.stockQuantity == 0}">Out of Stock</span>
+                            </div>
+                            <div class="card-img-container">
+                                <img th:src="${product.imageUrl != null ? product.imageUrl : '/images/product-placeholder.jpg'}" 
+                                     class="card-img-top" alt="Product Image">
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title" th:text="${product.name}">Product Name</h5>
+                                <p class="card-text text-muted small" th:if="${product.category != null}" th:text="${product.category.name}">Category</p>
+                                <p class="card-text text-primary fw-bold" th:text="${'$' + product.price}">$99.99</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <a th:href="@{/products/{id}(id=${product.id})}" class="btn btn-sm btn-outline-primary">View Details</a>
+                                    <form th:action="@{/cart/add}" method="post" sec:authorize="isAuthenticated()" th:if="${product.stockQuantity > 0}">
+                                        <input type="hidden" name="productId" th:value="${product.id}">
+                                        <input type="hidden" name="quantity" value="1">
+                                        <button type="submit" class="btn btn-sm btn-primary">
+                                            <i class="bi bi-cart-plus"></i> Add to Cart
+                                        </button>
+                                    </form>
+                                    <a th:href="@{/login}" class="btn btn-sm btn-primary" sec:authorize="!isAuthenticated()" th:if="${product.stockQuantity > 0}">
+                                        <i class="bi bi-cart-plus"></i> Add to Cart
+                                    </a>
+                                    <button class="btn btn-sm btn-secondary" disabled th:if="${product.stockQuantity == 0}">
+                                        Out of Stock
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- List View (hidden by default) -->
+                <div id="list-view" class="d-none">
+                    <div class="card mb-3" th:each="product : ${products}">
+                        <div class="row g-0">
+                            <div class="col-md-4">
+                                <img th:src="${product.imageUrl != null ? product.imageUrl : '/images/product-placeholder.jpg'}" 
+                                     class="img-fluid rounded-start" alt="Product Image">
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <h5 class="card-title" th:text="${product.name}">Product Name</h5>
+                                        <span class="badge bg-success" th:if="${product.stockQuantity > 10}">In Stock</span>
+                                        <span class="badge bg-warning text-dark" th:if="${product.stockQuantity > 0 && product.stockQuantity <= 10}">Low Stock</span>
+                                        <span class="badge bg-danger" th:if="${product.stockQuantity == 0}">Out of Stock</span>
+                                    </div>
+                                    <p class="card-text text-muted small" th:if="${product.category != null}" th:text="${product.category.name}">Category</p>
+                                    <p class="card-text" th:text="${#strings.abbreviate(product.description, 150)}">Product description...</p>
+                                    <p class="card-text text-primary fw-bold" th:text="${'$' + product.price}">$99.99</p>
+                                    <div class="d-flex gap-2">
+                                        <a th:href="@{/products/{id}(id=${product.id})}" class="btn btn-outline-primary">View Details</a>
+                                        <form th:action="@{/cart/add}" method="post" sec:authorize="isAuthenticated()" th:if="${product.stockQuantity > 0}">
+                                            <input type="hidden" name="productId" th:value="${product.id}">
+                                            <input type="hidden" name="quantity" value="1">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="bi bi-cart-plus"></i> Add to Cart
+                                            </button>
+                                        </form>
+                                        <a th:href="@{/login}" class="btn btn-primary" sec:authorize="!isAuthenticated()" th:if="${product.stockQuantity > 0}">
+                                            <i class="bi bi-cart-plus"></i> Add to Cart
+                                        </a>
+                                        <button class="btn btn-secondary" disabled th:if="${product.stockQuantity == 0}">
+                                            Out of Stock
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="d-flex justify-content-center mt-4">
+                    <nav th:if="${totalPages > 1}">
+                        <ul class="pagination">
+                            <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+                                <a class="page-link" th:href="@{/products(page=${currentPage - 1}, size=12, keyword=${keyword}, categoryId=${selectedCategory != null ? selectedCategory.id : null}, sort=${sort}, direction=${direction})}">&laquo;</a>
+                            </li>
+                            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" 
+                                th:classappend="${currentPage == i ? 'active' : ''}">
+                                <a class="page-link" th:href="@{/products(page=${i}, size=12, keyword=${keyword}, categoryId=${selectedCategory != null ? selectedCategory.id : null}, sort=${sort}, direction=${direction})}" th:text="${i + 1}">1</a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
+                                <a class="page-link" th:href="@{/products(page=${currentPage + 1}, size=12, keyword=${keyword}, categoryId=${selectedCategory != null ? selectedCategory.id : null}, sort=${sort}, direction=${direction})}">&raquo;</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer th:replace="fragments/layout :: footer"></footer>
+    <style>
+        /* Sidebar styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            bottom: 50%;
+            left: 0;
+            z-index: 100;
+            padding: 48px 0 0;
+            box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+        }
+
+        @media (max-width: 767.98px) {
+            .sidebar {
+                position: static;
+                padding-top: 0;
+            }
+        }
+
+        .sidebar .nav-link {
+            color: #333;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+        }
+
+        .sidebar .nav-link.active {
+            color: #0d6efd;
+            background-color: rgba(13, 110, 253, 0.1);
+        }
+
+        .sidebar-heading {
+            font-size: .75rem;
+            text-transform: uppercase;
+        }
+
+    </style>
+
+    <script>
+        function updateSortOrder() {
+            const sortSelect = document.getElementById('sort-select');
+            const [sort, direction] = sortSelect.value.split(',');
+            
+            const currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.set('sort', sort);
+            currentUrl.searchParams.set('direction', direction);
+            
+            window.location.href = currentUrl.toString();
+        }
+        
+        function toggleView(view) {
+            if (view === 'grid') {
+                document.getElementById('grid-view').classList.remove('d-none');
+                document.getElementById('list-view').classList.add('d-none');
+            } else {
+                document.getElementById('grid-view').classList.add('d-none');
+                document.getElementById('list-view').classList.remove('d-none');
+            }
+        }
+    </script>
+</body>
+</html>

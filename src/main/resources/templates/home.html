@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head th:replace="fragments/layout :: head(title='Home')"></head>
+<body>
+    <header th:replace="fragments/layout :: header"></header>
+    
+    <main class="container mt-5 pt-5">
+        <!-- Hero Section -->
+        <section class="hero-section mb-5">
+            <div class="p-5 mb-4 bg-light rounded-3">
+                <div class="container-fluid py-5">
+                    <h1 class="display-5 fw-bold">Welcome to Modern Shop</h1>
+                    <p class="col-md-8 fs-4">Discover our latest collection of high-quality products at competitive prices.</p>
+                    <a th:href="@{/products}" class="btn btn-primary btn-lg">Shop Now</a>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Featured Products -->
+        <section class="mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Featured Products</h2>
+                <a th:href="@{/products}" class="text-decoration-none">View All <i class="bi bi-arrow-right"></i></a>
+            </div>
+            
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+                <div class="col" th:each="product : ${featuredProducts}">
+                    <div class="card h-100 product-card">
+                        <div class="card-img-container">
+                            <img th:src="${product.imageUrl != null ? product.imageUrl : '/images/product-placeholder.jpg'}" 
+                                 class="card-img-top" alt="Product Image">
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title" th:text="${product.name}">Product Name</h5>
+                            <p class="card-text text-primary fw-bold" th:text="${'$' + product.price}">$99.99</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a th:href="@{/products/{id}(id=${product.id})}" class="btn btn-sm btn-outline-primary">View Details</a>
+                                <form th:action="@{/cart/add}" method="post" sec:authorize="isAuthenticated()">
+                                    <input type="hidden" name="productId" th:value="${product.id}">
+                                    <input type="hidden" name="quantity" value="1">
+                                    <button type="submit" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-cart-plus"></i> Add to Cart
+                                    </button>
+                                </form>
+                                <a th:href="@{/login}" class="btn btn-sm btn-primary" sec:authorize="!isAuthenticated()">
+                                    <i class="bi bi-cart-plus"></i> Add to Cart
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- New Arrivals -->
+        <section class="mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>New Arrivals</h2>
+                <a th:href="@{/products}" class="text-decoration-none">View All <i class="bi bi-arrow-right"></i></a>
+            </div>
+            
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+                <div class="col" th:each="product : ${newArrivals}">
+                    <div class="card h-100 product-card">
+                        <div class="position-absolute top-0 end-0 p-2">
+                            <span class="badge bg-primary">New</span>
+                        </div>
+                        <div class="card-img-container">
+                            <img th:src="${product.imageUrl != null ? product.imageUrl : '/images/product-placeholder.jpg'}" 
+                                 class="card-img-top" alt="Product Image">
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title" th:text="${product.name}">Product Name</h5>
+                            <p class="card-text text-primary fw-bold" th:text="${'$' + product.price}">$99.99</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a th:href="@{/products/{id}(id=${product.id})}" class="btn btn-sm btn-outline-primary">View Details</a>
+                                <form th:action="@{/cart/add}" method="post" sec:authorize="isAuthenticated()">
+                                    <input type="hidden" name="productId" th:value="${product.id}">
+                                    <input type="hidden" name="quantity" value="1">
+                                    <button type="submit" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-cart-plus"></i> Add to Cart
+                                    </button>
+                                </form>
+                                <a th:href="@{/login}" class="btn btn-sm btn-primary" sec:authorize="!isAuthenticated()">
+                                    <i class="bi bi-cart-plus"></i> Add to Cart
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Categories -->
+        <section class="mb-5">
+            <h2 class="mb-4">Shop by Category</h2>
+            
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                <div class="col" th:each="category : ${categories}">
+                    <div class="card h-100 category-card">
+                        <div class="card-body text-center p-4">
+                            <h3 class="card-title mb-3" th:text="${category.name}">Category Name</h3>
+                            <p class="card-text" th:text="${category.description != null ? category.description : 'Explore our collection'}">
+                                Category description goes here.
+                            </p>
+                            <a th:href="@{/products(categoryId=${category.id})}" class="btn btn-outline-primary">
+                                View Products
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer th:replace="fragments/layout :: footer"></footer>
+</body>
+</html>

@@ -1,0 +1,243 @@
+/* Global Styles */
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    color: #333;
+    padding-top: 56px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Fixed header padding */
+main {
+    padding-top: 2rem;
+    flex: 1 0 auto;
+}
+
+/* Admin layout specific styles */
+.admin-content {
+    padding-top: 4.5rem;
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    padding: 72px 0 0;
+    box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+}
+
+@media (max-width: 767.98px) {
+    .sidebar {
+        position: static;
+        padding-top: 1rem;
+    }
+
+    .admin-content {
+        padding-top: 1rem;
+    }
+}
+
+/* Alert container */
+.alert-container {
+    position: fixed;
+    top: 56px;
+    left: 0;
+    right: 0;
+    z-index: 1030;
+    padding: 1rem;
+}
+
+/* Footer styles */
+.footer {
+    flex-shrink: 0;
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+    padding: 2rem 0;
+    margin-top: 3rem;
+    width: 100%;
+}
+
+/* Product Card Styles */
+.product-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+.card-img-container {
+    position: relative;
+    width: 100%;
+    padding-top: 95%; /* 4:3 Aspect Ratio */
+    overflow: hidden;
+}
+
+.card-img-top {
+    position: absolute;
+    top: 10%;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 1rem;
+    transition: transform 0.5s ease;
+}
+
+.product-card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+/* Category Card Styles */
+.category-card {
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Hero Section */
+.hero-section {
+    background-image: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7)), url('https://images.pexels.com/photos/5632402/pexels-photo-5632402.jpeg');
+    background-size: cover;
+    background-position: center;
+    border-radius: 10px;
+}
+
+/* Navbar customization */
+.navbar-brand {
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.navbar {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Button styles */
+.btn-primary {
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(13, 110, 253, 0.2);
+}
+
+/* Cart page styles */
+.table th {
+    border-top: none;
+}
+
+/* Admin dashboard styles */
+.sidebar .nav-link:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.sidebar .nav-link {
+    color: #333;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+}
+
+.sidebar .nav-link.active {
+    color: #0d6efd;
+    background-color: rgba(13, 110, 253, 0.1);
+}
+
+.sidebar-heading {
+    font-size: .75rem;
+    text-transform: uppercase;
+}
+
+/* Profile page styles */
+.list-group-item.active {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+/* Product Detail Page */
+.product-details .img-fluid {
+    border-radius: 8px;
+    max-height: 500px;
+    width: 100%;
+    object-fit: contain;
+    background-color: #fff;
+    padding: 1rem;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+    background-color: transparent;
+    padding: 0.5rem 0;
+}
+
+/* Checkout form */
+.form-label {
+    font-weight: 500;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.fadeIn {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Timeline styles for order tracking */
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 10px;
+    width: 2px;
+    background-color: #e9ecef;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.timeline-marker {
+    position: absolute;
+    top: 5px;
+    left: -30px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: #0d6efd;
+    z-index: 100;
+}
+
+.timeline-marker-inactive {
+    background-color: #adb5bd;
+}
+
+.timeline-item-inactive {
+    opacity: 0.7;
+}
+
+

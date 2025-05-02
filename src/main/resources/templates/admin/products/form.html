@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/layout :: head(title=${product.id != null ? 'Edit Product' : 'Add New Product'})"></head>
+<body>
+    <header th:replace="fragments/layout :: header"></header>
+    
+    <main class="container-fluid mt-5 pt-5">
+        <div class="row">
+            <!-- Admin Sidebar -->
+            <div class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+                <div class="position-sticky pt-3">
+                    <h5 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                        <span>Admin Dashboard</span>
+                    </h5>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/admin}">
+                                <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" th:href="@{/admin/products}">
+                                <i class="bi bi-box-seam me-2"></i> Products
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/admin/categories}">
+                                <i class="bi bi-tags me-2"></i> Categories
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/admin/orders}">
+                                <i class="bi bi-cart3 me-2"></i> Orders
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/admin/users}">
+                                <i class="bi bi-people me-2"></i> Users
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2" th:text="${product.id != null ? 'Edit Product' : 'Add New Product'}">Add/Edit Product</h1>
+                    <a th:href="@{/admin/products}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to Products
+                    </a>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form th:action="@{/admin/products/save}" th:object="${product}" method="post" enctype="multipart/form-data">
+                            <input type="hidden" th:field="*{id}">
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-8">
+                                    <label for="name" class="form-label">Product Name</label>
+                                    <input type="text" class="form-control" id="name" th:field="*{name}" required>
+                                    <div class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="categoryId" class="form-label">Category</label>
+                                    <select class="form-select" id="categoryId" name="categoryId" required>
+                                        <option value="">Select Category</option>
+                                        <option th:each="category : ${categories}" 
+                                                th:value="${category.id}" 
+                                                th:text="${category.name}"
+                                                th:selected="${product.category != null && product.category.id == category.id}">
+                                            Category Name
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label for="price" class="form-label">Price</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control" id="price" th:field="*{price}" min="0" step="0.01" required>
+                                    </div>
+                                    <div class="text-danger" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="stockQuantity" class="form-label">Stock Quantity</label>
+                                    <input type="number" class="form-control" id="stockQuantity" th:field="*{stockQuantity}" min="0" required>
+                                    <div class="text-danger" th:if="${#fields.hasErrors('stockQuantity')}" th:errors="*{stockQuantity}"></div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Featured Product</label>
+                                    <div class="form-check form-switch mt-2">
+                                        <input class="form-check-input" type="checkbox" id="featured" th:field="*{featured}">
+                                        <label class="form-check-label" for="featured">Display on homepage</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Product Description</label>
+                                <textarea class="form-control" id="description" th:field="*{description}" rows="5"></textarea>
+                            </div>
+                            
+                            <div class="row mb-4 align-items-end">
+                                <div class="col-md-8">
+                                    <label for="image" class="form-label">Product Image</label>
+                                    <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                                    <div class="form-text">Leave empty to keep the current image.</div>
+                                </div>
+                                <div class="col-md-4" th:if="${product.imageUrl != null}">
+                                    <div class="card">
+                                        <div class="card-body p-2 text-center">
+                                            <p class="mb-2">Current Image:</p>
+                                            <img th:src="${product.imageUrl}" alt="Current Product Image" 
+                                                 class="img-thumbnail" style="max-height: 100px;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between">
+                                <a th:href="@{/admin/products}" class="btn btn-outline-secondary">Cancel</a>
+                                <button type="submit" class="btn btn-primary">Save Product</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer th:replace="fragments/layout :: footer"></footer>
+    
+    <style>
+        /* Sidebar styles (same as in dashboard) */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            bottom: 36%;
+            left: 0;
+            z-index: 100;
+            padding: 48px 0 0;
+            box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+        }
+        
+        @media (max-width: 767.98px) {
+            .sidebar {
+                position: static;
+                padding-top: 0;
+            }
+        }
+        
+        .sidebar .nav-link {
+            color: #333;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+        }
+        
+        .sidebar .nav-link.active {
+            color: #0d6efd;
+            background-color: rgba(13, 110, 253, 0.1);
+        }
+        
+        .sidebar-heading {
+            font-size: .75rem;
+            text-transform: uppercase;
+        }
+    </style>
+</body>
+</html>

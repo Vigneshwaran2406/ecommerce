@@ -1,0 +1,3 @@
+# Image Placeholder
+
+This directory will store product images and other assets.
